@@ -1,12 +1,15 @@
+const route = require('./app/routes/index')
+const { json } = require('express');
 var express = require('express');
+var bodyParser = require('body-parser')
+const db = require('./app/configs/database')
+
 
 var app = express();
 
-app.get('/', function (req, res) {
-    res.send('This is home!');
-});
-app.get('/contact/:userId/send/:content', function (req, res) {
-    res.send('Custom with id is ' + req.params.userId + ' want to said: ' + req.params.content);
-});
+app.use(express.urlencoded({extended : true}));
+app.use(express.json());
+
+route(app);
 
 app.listen(8000);
