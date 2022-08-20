@@ -1,0 +1,18 @@
+{
+  "name": "learn_nodejs",
+  "version": "1.0.0",
+  "description": "learn",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "to",
+    "do"
+  ],
+  "author": "dunt",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.19"
+  }
+}
