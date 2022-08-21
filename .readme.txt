@@ -1,0 +1,10 @@
+# kill server
+sudo lsof -i :8000
+kill -9 76318
+
+create table: npx sequelize-cli model:generate --name User --attributes firstName:string,lastName:string,email:string,address:string
+migration: npx sequelize-cli db:migrate
+undo migration: npx sequelize-cli db:migrate:undo
+create seeder: npx sequelize-cli seed:generate --name demo-user
+do seeder: npx sequelize-cli db:seed:all
+undo seeder: npx sequelize-cli db:seed:undo
