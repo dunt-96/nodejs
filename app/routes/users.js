@@ -9,5 +9,12 @@ router.delete('/delete', userController.deleteAllUser);
 router.post('/add', userController.addUser);
 router.put('/edit/:id', userController.editUser);
 
+// router.use('/', (req, res) => {
+//     return res.status(404).json({
+//         status: false,
+//         notice: "404 not found"
+//     })
+// })
+
 
 module.exports = router;

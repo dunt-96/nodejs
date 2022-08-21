@@ -1,129 +1,157 @@
 const pool = require('../configs/database')
-
+const user = require('../models/user')
+const db = require('../models/index')
 class UserController {
     async getAllUser(req, res) {
-        const [rows, fields] = await pool.execute('SELECT * FROM `users`');
-
-        // return res.status(200).send(JSON.stringify({
-        //     status: true,
-        //     notice: "Success",
-        //     data: rows
-        // }));
-        return res.status(200).json({
-            status: true,
-            notice: "Success",
-            data: rows
+        await db.User.findAll().then((data) => {
+            return res.status(200).json({
+                status: true,
+                notice: "Success",
+                data: data
+            });
         });
     }
 
+    // Delete everyone named "Jane"
+    // await User.destroy({
+    //   where: {
+    //     firstName: "Jane"
+    //   }
+    // });
     async deleteUser(req, res) {
-        const query = 'DELETE FROM `users` WHERE id = ' + req.params.id;
-
-        const [rows, fields] = await pool.execute(query)
-
-        console.log(rows.affectedRows);
-
-        if (rows.affectedRows != 0)
-            return res.send(JSON.stringify({
-                status: true,
-                notice: "Xoa nguoi dung thanh cong",
-                data: rows
-            }));
-
-        return res.status(200).send(JSON.stringify({
-            status: false,
-            notice: "Xoa nguoi dung that bai",
-        }));
-    }
+        await db.User.destroy({
+            where: {
+                id: parseInt(req.params.id)
+            }
+        }).then((data) => {
+            if (data) {
+                return res.status(200).json({
+                    status: true,
+                    notice: "Xoa nguoi dung thanh cong",
+                    data: data
+                })
+            }
+            return res.status(200).json({
+                status: false,
+                notice: "Xoa nguoi dung that bai",
+                data: data
+            })
+        });
+    };
 
     async deleteAllUser(req, res) {
-        const query = 'DELETE FROM `users`';
-
-        const [rows, fields] = await pool.execute(query)
-
-        console.log(rows.affectedRows);
-
-        if (rows.affectedRows != 0)
-            return res.send(JSON.stringify({
-                status: true,
-                notice: "Xoa nguoi dung thanh cong",
-                data: rows
-            }));
-
-        return res.send(JSON.stringify({
-            status: false,
-            notice: "Xoa nguoi dung that bai",
-        }));
+        await db.User.destroy({
+            truncate: true
+        }).then((data) => {
+            if (data == 0) {
+                return res.status(200).json({
+                    status: true,
+                    notice: "Xoa thanh cong"
+                });
+            }
+        });
     }
 
     async addUser(req, res) {
-        console.log(req.body['email']);
         let { firstName, lastName, email, address } = req.body;
 
-        const checkMailQuery = 'SELECT * FROM `users` WHERE email = \'' + email + '\'';
+        // const checkMailQuery = 'SELECT * FROM `users` WHERE email = \'' + email + '\'';
 
-        const [rowsMail, fieldsMail] = await pool.execute(checkMailQuery);
-        console.log(rowsMail.length);
+        // const [rowsMail, fieldsMail] = await pool.execute(checkMailQuery);
+        // console.log(rowsMail.length);
 
-        if (rowsMail.length != 0) {
+        // if (rowsMail.length != 0) {
+        //     return res.send(JSON.stringify({
+        //         status: false,
+        //         notice: "Email da bi trung",
+        //         data: rowsMail
+        //     }));
+        // }
+
+        const checkExistUser = await db.User.findAll({
+            where: {
+                email: email
+            }
+        })
+
+        console.log(checkExistUser.length);
+
+        if (checkExistUser.length != 0) {
             return res.send(JSON.stringify({
                 status: false,
                 notice: "Email da bi trung",
-                data: rowsMail
+                data: checkExistUser
             }));
         }
 
-        const query = 'insert into users (firstName, lastName, email, address) values (?, ?, ?, ?)'
-        const [rows, fields] = await pool.execute(query, [firstName, lastName, email, address]);
+        const result = await db.User.create({
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            address: address
+        });
 
-        console.log(rows.affectedRows);
+        console.log(result);
 
-        if (rows.affectedRows != 0)
+        // const query = 'insert into users (firstName, lastName, email, address) values (?, ?, ?, ?)'
+        // const [rows, fields] = await pool.execute(query, [firstName, lastName, email, address]);
+
+        // console.log(rows.affectedRows);
+
+        if (result.dataValues != null)
             return res.send(JSON.stringify({
                 status: true,
                 notice: "Them nguoi dung thanh cong",
-                data: rows
+                data: result
             }));
 
         return res.send(JSON.stringify({
             status: false,
             notice: "Them nguoi dung that bai",
         }));
-
-
     }
 
     async getUserById(req, res) {
-        let data = [];
-        pool.query(
-            'SELECT * FROM `users`',
-            function (err, results, fields) {
-                console.log(results); // results contains rows returned by server
-                console.log(fields); // fields contains extra meta data about results, if available
-                data = results;
+        const user = db.User.findAll({
+            where: {
+                id: parseInt(req.params.id)
             }
-        );
+        });
 
 
         return res.send(JSON.stringify({
             status: true,
             notice: "Success",
-            data: data
+            data: user
         }));
     }
     async editUser(req, res) {
         let { firstName, lastName, email, address } = req.body;
-        let query = 'update users set firstName = ?, lastName = ?, email = ?, address = ? where id = ?';
-        // let query1 = "update users set firstName = 'long', lastName = 'hoang', email = 'long@gmail.com', address = 'tp HCM' where id = 23";
+        // let query = 'update users set firstName = ?, lastName = ?, email = ?, address = ? where id = ?';
+        // // let query1 = "update users set firstName = 'long', lastName = 'hoang', email = 'long@gmail.com', address = 'tp HCM' where id = 23";
 
-        const [rows, fields] = await pool.execute(query, [firstName, lastName, email, address, parseInt(req.params.id)]);
+        // const [rows, fields] = await pool.execute(query, [firstName, lastName, email, address, parseInt(req.params.id)]);
 
-        console.log(rows);
-        return res.send(JSON.stringify({
-            status: true,
-            notice: "Success",
-            data: rows
-        }));
+        // console.log(rows);
+        // return res.send(JSON.stringify({
+        //     status: true,
+        //     notice: "Success",
+        //     data: rows
+        // }));
+
+        // Change everyone without a last name to "Doe"
+        await db.User.update({ firstName: firstName, lastName: lastName, email: email, address: address }, {
+            where: {
+                id: parseInt(req.params.id)
+            }
+        }).then((data) => {
+            if (data)
+                return res.status(200).json({
+                    status: true,
+                    notice: "Sua nguoi dung thanh cong",
+                    data: data.dataValues
+                });
+        });
     }
 }
 

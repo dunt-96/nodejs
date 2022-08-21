@@ -1,19 +1,19 @@
-// get the client
-const mysql = require('mysql2/promise');
+const { Sequelize } = require('sequelize');
 
-// create the connection to database
-const pool = mysql.createPool({
+// Option 3: Passing parameters separately (other dialects)
+const sequelize = new Sequelize('nodejsbasic', 'root', null, {
     host: 'localhost',
-    user: 'root',
-    database: 'nodejsbasic'
+    dialect: 'mysql',
+    logging: false
 });
-// connection.query(
-//     'SELECT * FROM `users`',
-//     function (err, results, fields) {
-//         console.log(results); // results contains rows returned by server
-//         console.log(fields); // fields contains extra meta data about results, if available
-//         data = results;
-//     }
-// );
 
-module.exports = pool;
+let connectDB = async () => {
+    try {
+        await sequelize.authenticate();
+        console.log('Connection has been established successfully.');
+    } catch (error) {
+        console.error('Unable to connect to the database:', error);
+    }
+}
+
+module.exports = connectDB;

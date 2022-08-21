@@ -12,4 +12,11 @@ router.put('/edit', courseController.editCourse);
 
 router.delete('/delete/:id', courseController.deleteCourse);
 
+router.use('/', (req, res) => {
+    return res.status(404).json({
+        status: false,
+        notice: "404 not found"
+    })
+})
+
 module.exports = router;
