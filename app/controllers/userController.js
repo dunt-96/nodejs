@@ -4,15 +4,40 @@ class UserController {
     async getAllUser(req, res) {
         const [rows, fields] = await pool.execute('SELECT * FROM `users`');
 
-        return res.send(JSON.stringify({
+        // return res.status(200).send(JSON.stringify({
+        //     status: true,
+        //     notice: "Success",
+        //     data: rows
+        // }));
+        return res.status(200).json({
             status: true,
             notice: "Success",
             data: rows
-        }));
+        });
     }
 
     async deleteUser(req, res) {
         const query = 'DELETE FROM `users` WHERE id = ' + req.params.id;
+
+        const [rows, fields] = await pool.execute(query)
+
+        console.log(rows.affectedRows);
+
+        if (rows.affectedRows != 0)
+            return res.send(JSON.stringify({
+                status: true,
+                notice: "Xoa nguoi dung thanh cong",
+                data: rows
+            }));
+
+        return res.status(200).send(JSON.stringify({
+            status: false,
+            notice: "Xoa nguoi dung that bai",
+        }));
+    }
+
+    async deleteAllUser(req, res) {
+        const query = 'DELETE FROM `users`';
 
         const [rows, fields] = await pool.execute(query)
 
@@ -87,21 +112,17 @@ class UserController {
         }));
     }
     async editUser(req, res) {
-        let data = [];
-        pool.query(
-            'SELECT * FROM `users`',
-            function (err, results, fields) {
-                console.log(results); // results contains rows returned by server
-                console.log(fields); // fields contains extra meta data about results, if available
-                data = results;
-            }
-        );
+        let { firstName, lastName, email, address } = req.body;
+        let query = 'update users set firstName = ?, lastName = ?, email = ?, address = ? where id = ?';
+        // let query1 = "update users set firstName = 'long', lastName = 'hoang', email = 'long@gmail.com', address = 'tp HCM' where id = 23";
 
+        const [rows, fields] = await pool.execute(query, [firstName, lastName, email, address, parseInt(req.params.id)]);
 
+        console.log(rows);
         return res.send(JSON.stringify({
             status: true,
             notice: "Success",
-            data: data
+            data: rows
         }));
     }
 }
