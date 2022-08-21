@@ -1,5 +1,5 @@
+const db = require('../models/index');
 var bcrypt = require('bcryptjs');
-const db = require('../models/index')
 const salt = bcrypt.genSaltSync(10);
 
 let hashUserPassword = (password) => {
@@ -42,7 +42,7 @@ let checkIsExistUser = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             console.log(data.email);
-            const user = await db.User.findAll({
+            const user = await db.User.findOne({
                 raw: true,
                 where: {
                     email: data.email
@@ -62,7 +62,11 @@ let findUserById = (id) => {
             const user = await db.User.findOne({
                 where: {
                     id: id
-                }
+                },
+                attributes: {
+                    exclude: ['password']
+                },
+                raw: true
             })
             resolve(user);
 
@@ -134,7 +138,12 @@ let editUser = (data, id) => {
 let getAllUser = () => {
     return new Promise(async (resolve, reject) => {
         try {
-            await db.User.findAll().then((data) => {
+            await db.User.findAll({
+                attributes: {
+                    exclude: ['password']
+                },
+                raw: true
+            }).then((data) => {
                 resolve(data);
             });
         } catch (error) {
@@ -143,6 +152,20 @@ let getAllUser = () => {
     });
 }
 
+let handleLogin = (data, user, callback) => {
+    console.log(user.password);
+    return new Promise(async (resolve, reject) => {
+
+        let result = await bcrypt.compareSync(data.password, user.password);
+
+        if (result) {
+            return resolve(user);
+        }
+
+        callback("Error password");
+    });
+};
+
 module.exports = {
     createNewUser,
     checkIsExistUser,
@@ -150,5 +173,6 @@ module.exports = {
     findUserById,
     getAllUser,
     deleteAllUser,
-    editUser
+    editUser,
+    handleLogin
 }

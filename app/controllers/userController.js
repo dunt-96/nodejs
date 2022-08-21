@@ -1,10 +1,8 @@
-const pool = require('../configs/database')
-const user = require('../models/user')
 const db = require('../models/index')
-const CRUDServices = require('../services/CRUDService')
+const userService = require('../services/userService')
 class UserController {
     async getAllUser(req, res) {
-        await CRUDServices.getAllUser().then((data) => {
+        await userService.getAllUser().then((data) => {
             return res.status(200).json({
                 status: true,
                 notice: "Success",
@@ -14,9 +12,9 @@ class UserController {
     }
 
     async deleteUser(req, res) {
-        await CRUDServices.findUserById(parseInt(req.params.id)).then(async (result) => {
+        await userService.findUserById(parseInt(req.params.id)).then(async (result) => {
             if (result.dataValues != null) {
-                await CRUDServices.deleteUser(parseInt(req.params.id)).then((data) => {
+                await userService.deleteUser(parseInt(req.params.id)).then((data) => {
                     if (data) {
                         return res.status(200).json({
                             status: true,
@@ -35,7 +33,7 @@ class UserController {
     };
 
     async deleteAllUser(req, res) {
-        await CRUDServices.deleteAllUser().then((result) => {
+        await userService.deleteAllUser().then((result) => {
             if (result == 0) {
                 return res.status(200).json({
                     status: true,
@@ -51,7 +49,7 @@ class UserController {
     }
 
     async addUser(req, res) {
-        await CRUDServices.checkIsExistUser(req.body).then(async (user) => {
+        await userService.checkIsExistUser(req.body).then(async (user) => {
             if (user.length != 0) {
                 return res.status(200).json({
                     status: false,
@@ -60,7 +58,7 @@ class UserController {
                 });
             }
 
-            let result = await CRUDServices.createNewUser(req.body);
+            let result = await userService.createNewUser(req.body);
 
             if (result.dataValues != null) {
                 return res.send(JSON.stringify({
@@ -92,11 +90,57 @@ class UserController {
     }
 
     async editUser(req, res) {
-        await CRUDServices.editUser(req.body, req.params.id).then((data) => {
+        await userService.editUser(req.body, req.params.id).then((data) => {
             return res.status(200).json({
                 status: true,
                 notice: "Sua thanh cong",
                 data: data
+            });
+        });
+    }
+
+    async login(req, res) {
+
+        // check email exist
+        // compare pw
+        // return userInfo
+        // access token
+        let email = req.body.email;
+        let pw = req.body.password;
+
+        if (!email || !pw) {
+            return res.status(500).json({
+                status: false,
+                message: "Missing inputs parameter"
+            });
+        }
+
+        await userService.checkIsExistUser(req.body).then(async (result) => {
+            if (result) {
+                function callback(msg) {
+                    return res.status(200).json({
+                        status: false,
+                        message: msg,
+                    });
+                }
+
+                await userService.handleLogin(req.body, result, callback).then((result) => {
+                    if (result) {
+                        delete result.password;
+
+                        return res.status(200).json({
+                            status: true,
+                            message: "Success",
+                            data: result
+                        });
+                    }
+                });
+            }
+
+            return res.status(200).json({
+                status: true,
+                message: "Fail",
+                data: "Error email"
             });
         });
     }

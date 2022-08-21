@@ -8,6 +8,7 @@ router.delete('/delete/:id', userController.deleteUser);
 router.delete('/delete', userController.deleteAllUser);
 router.post('/add', userController.addUser);
 router.put('/edit/:id', userController.editUser);
+router.post('/login', userController.login);
 
 // router.use('/', (req, res) => {
 //     return res.status(404).json({
