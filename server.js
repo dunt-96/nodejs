@@ -17,5 +17,5 @@ route(app);
 
 
 connectDB();
-console.log('<<<<<<<<< running on port: ',port);
+console.log('<<<<<<<<< running on port:',port);
 app.listen(port);
