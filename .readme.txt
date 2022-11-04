@@ -8,3 +8,14 @@ undo migration: npx sequelize-cli db:migrate:undo
 create seeder: npx sequelize-cli seed:generate --name demo-user
 do seeder: npx sequelize-cli db:seed:all
 undo seeder: npx sequelize-cli db:seed:undo
+
+#upload file
+1 - conver file to base64 from client then send BE. from that BE just only get this value and save to DB.
+2 - to get imgae client have to convert file from buffe to base 64
+
+$note when upload file
+1 - check xampp at init file adjust "max_allowed_packet"
+2 - check   app.use(express.urlencoded({ extended: true,limit: '50mb' }));
+            app.use(express.json({limit: '50mb'}));
+3 - remember BLOB(long) in DB 
+4 - video #62 (71/119) hoidanit series full stack

@@ -1,6 +1,8 @@
 class CourseController {
   getCourseById(req, res) {
-    const course = courses.find((course) => course.id === parseInt(req.params.id));
+    const course = courses.find(
+      (course) => course.id === parseInt(req.params.id)
+    );
 
     if (!course) res.status(404).send('Id ko ton tai');
 
@@ -25,14 +27,11 @@ class CourseController {
     var course = courses.find((e) => e.id === parseInt(req.params.id));
     console.log(course);
 
-    if (!course)
-      res.send(
-        JSON.stringify({
-          status: false,
-          notice: 'Xoa that bai',
-          data: courses,
-        })
-      );
+        if (!course) res.send(JSON.stringify({
+            status: false,
+            notice: "Xoa that bai",
+            data: courses
+        }));
 
     // courses = courses.filter(e => {
     //     return e.id != parseInt(req.params.id);
@@ -40,16 +39,14 @@ class CourseController {
     const idx = courses.indexOf(course);
     courses.splice(idx, 1);
 
-    return res.send(
-      JSON.stringify({
-        status: true,
-        notice: 'Xoa thanh cong',
-        data: courses,
-      })
-    );
-  }
-  editCourse(req, res) {
-    const course = req.body;
+        return res.send(JSON.stringify({
+            status: true,
+            notice: "Xoa thanh cong",
+            data: courses
+        }));
+    }
+    editCourse(req, res) {
+        const course = req.body;
 
     console.log(course);
 
